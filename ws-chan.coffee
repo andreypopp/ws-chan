@@ -2,14 +2,19 @@ websocket = require 'websocket-stream'
 backoff = require 'backoff'
 Stream = require 'stream'
 
-through = (fn) ->
-  cls = class extends Stream.Transform
-    _transform: (chunk, encoding, cb) ->
-      try
-        cb(null, if fn? then fn(chunk) else chunk)
-      catch e
-        cb(e, null)
-  new cls(objectMode: true)
+class SyncTransform extends Stream.Transform
+
+  constructor: (fn, options) ->
+    options = Object.create(options)
+    options.objectMode = true
+    super(options)
+    this.fn = fn
+
+  _transform: (chunk, encoding, cb) ->
+    try
+      cb(null, if this.fn? then this.fn(chunk) else chunk)
+    catch e
+      cb(e, null)
 
 class Channel
 
@@ -37,11 +42,11 @@ class Channel
     this.sock.on 'error', this.onError.bind(this)
 
     this.sock
-      .pipe(through(JSON.parse))
+      .pipe(new SyncTransform(JSON.parse))
       .pipe(this.in, end: false)
 
     this.out
-      .pipe(through(JSON.stringify), end: false)
+      .pipe(new SyncTransform(JSON.stringify), end: false)
       .pipe(this.sock)
 
   stop: ->
