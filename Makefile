@@ -1,4 +1,4 @@
-COFFEE = node_modules/.bin/coffee
+BIN = node_modules/.bin
 SRCDIR = .
 LIBDIR = .
 SRC = $(shell find $(SRCDIR) -name '*.coffee' -type f)
@@ -9,6 +9,7 @@ all: build
 build: $(LIB)
 
 test:
+	@$(BIN)/mocha --compilers coffee:coffee-script -C spec/
 
 deps:
 	@npm install
@@ -18,7 +19,7 @@ clean:
 
 $(LIBDIR)/%.js: $(SRCDIR)/%.coffee
 	mkdir -p $(@D)
-	$(COFFEE) -cp $< > $@
+	$(BIN)/coffee -cp $< > $@
 
 release-patch: build test
 	@$(call release,patch)

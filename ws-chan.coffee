@@ -1,10 +1,11 @@
 websocket = require 'websocket-stream'
 backoff = require 'backoff'
 Stream = require 'stream'
+{EventEmitter} = require 'events'
 
 class SyncTransform extends Stream.Transform
 
-  constructor: (fn, options) ->
+  constructor: (fn, options = {}) ->
     options = Object.create(options)
     options.objectMode = true
     super(options)
@@ -16,9 +17,9 @@ class SyncTransform extends Stream.Transform
     catch e
       cb(e, null)
 
-class Channel
+class Channel extends EventEmitter
 
-  constructor: (uri, options) ->
+  constructor: (uri, options = {}) ->
     this.uri = uri
     this.options = options
     this.sock = undefined
@@ -32,11 +33,13 @@ class Channel
       this.backoffState.on 'ready', this.onBackoffReady.bind(this)
       this.backoffState.on 'fail', this.onBackoffFail.bind(this)
 
-    this.in = through()
-    this.out = through()
+    this.in = new Stream.PassThrough(objectMode: true)
+    this.out = new Stream.PassThrough(objectMode: true)
+
+    this.start() if options.start
 
   start: ->
-    this.sock = websocket(this.uri)
+    this.sock = this.createSocket()
     this.sock.on 'open',  this.onOpen.bind(this)
     this.sock.on 'end',   this.onEnd.bind(this)
     this.sock.on 'error', this.onError.bind(this)
@@ -48,7 +51,7 @@ class Channel
     this.out
       .pipe(new SyncTransform(JSON.stringify), end: false)
       .pipe(this.sock)
-
+    
   stop: ->
     this.preventBackoff = true
     this.sock.end()
@@ -61,6 +64,9 @@ class Channel
     if this.backoffState?
       this.backoffState.reset()
 
+  createSocket: ->
+    websocket(this.uri)
+
   cleanup: ->
     this.out.unpipe()
 
@@ -69,15 +75,18 @@ class Channel
 
   onOpen: ->
     this.log "connection established"
+    this.emit 'open', this
     this.resetBackoff()
 
   onEnd: ->
     this.log "connection terminated"
+    this.emit 'end', this
     this.cleanup()
     this.backoff()
 
   onError: (e) ->
     this.log "error #{e}"
+    this.emit 'error', e, this
     this.cleanup()
     this.backoff()
 
@@ -91,6 +100,6 @@ class Channel
   onBackoffFail: ->
     this.log "out of attempts to re-establish connection"
 
-exports = (uri, options) -> new Channel(uri, options)
-exports.channel = exports
-exports.Channel = Channel
+module.exports = (uri, options) -> new Channel(uri, options)
+module.exports.channel = exports
+module.exports.Channel = Channel

@@ -8,7 +8,8 @@
     "backoff": ""
   },
   "devDependencies": {
-    "coffee-script": ""
+    "coffee-script": "",
+    "mocha": ""
   },
   "repository": {
       "type": "git",

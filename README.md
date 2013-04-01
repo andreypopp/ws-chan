@@ -19,3 +19,10 @@ ch.in.on('data', function(message) {
 });
 ch.out.write({'data': 1});
 ```
+
+Channel also emits `open`, `end` and `error` events on corresponding socket
+stream events.
+
+On socket `end` and `error` channel tries to re-establish a connection after
+some timeout which is handled by node-backoff module (by default exponential
+backoff algorithm is used).
