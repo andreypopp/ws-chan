@@ -8,6 +8,7 @@
     "backoff": ""
   },
   "devDependencies": {
+    "semver": "",
     "coffee-script": "",
     "mocha": ""
   },
