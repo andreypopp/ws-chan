@@ -1,6 +1,6 @@
 {
   "name": "ws-chan",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "WebSocket Channel — websocket interaction modeled as a pair of streams for incoming and outgoing messages correspondingly",
   "main": "ws-chan.js",
   "dependencies": {
@@ -13,22 +13,22 @@
     "mocha": ""
   },
   "repository": {
-      "type": "git",
-      "url": "git://github.com/andreypopp/ws-chan.git"
+    "type": "git",
+    "url": "git://github.com/andreypopp/ws-chan.git"
   },
   "homepage": "https://github.com/andreypopp/ws-chan",
   "keywords": [
-      "browser",
-      "websocket",
-      "stream",
-      "streams",
-      "ws",
-      "backoff"
+    "browser",
+    "websocket",
+    "stream",
+    "streams",
+    "ws",
+    "backoff"
   ],
   "author": {
-      "name": "Andrey Popp",
-      "email": "8mayday@gmail.com",
-      "url": "http://andreypopp.com"
+    "name": "Andrey Popp",
+    "email": "8mayday@gmail.com",
+    "url": "http://andreypopp.com"
   },
   "license": "MIT"
 }
