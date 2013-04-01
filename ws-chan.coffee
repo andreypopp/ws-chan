@@ -35,10 +35,12 @@ class Channel extends EventEmitter
 
     this.in = new Stream.PassThrough(objectMode: true)
     this.out = new Stream.PassThrough(objectMode: true)
+    this.out.pause()
 
     this.start() if options.start
 
   start: ->
+    return if this.sock?
     this.sock = this.createSocket()
     this.sock.on 'open',  this.onOpen.bind(this)
     this.sock.on 'end',   this.onEnd.bind(this)
@@ -69,22 +71,26 @@ class Channel extends EventEmitter
 
   cleanup: ->
     this.out.unpipe()
+    this.sock = undefined
 
   log: (msg) ->
     console.log "channel: #{msg}"
 
   onOpen: ->
+    this.out.resume()
     this.log "connection established"
     this.emit 'open', this
     this.resetBackoff()
 
   onEnd: ->
+    this.out.pause()
     this.log "connection terminated"
     this.emit 'end', this
     this.cleanup()
     this.backoff()
 
   onError: (e) ->
+    this.out.pause()
     this.log "error #{e}"
     this.emit 'error', e, this
     this.cleanup()

@@ -4,8 +4,7 @@ stream = require 'stream'
 
 class TestChannel extends Channel
 
-  constructor: (options) ->
-    options.start = true
+  constructor: (options = {}) ->
     super('', options)
 
   createSocket: ->
@@ -35,6 +34,19 @@ describe 'Channel', ->
       done()
 
     chan.sock.write(JSON.stringify({hello: 'world'}))
+
+  it 'queues outgoing messages before connect', (done) ->
+    chan = new TestChannel()
+
+    chan.out.write({hello: 'world'})
+
+    chan.on 'open', ->
+      chan.sock.on 'data', (chunk) ->
+        data = JSON.parse(chunk)
+        deepEqual(data, {hello: 'world'})
+        done()
+
+    chan.start()
 
   describe 'reconnection logic', ->
 
