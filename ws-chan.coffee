@@ -1,9 +1,10 @@
 websocket = require 'websocket-stream'
 backoff = require 'backoff'
-Stream = require 'stream'
+{Transform, PassThrough} = require 'stream'
+{Transform, PassThrough} = require 'readable-stream' unless Transform? and PassThrough?
 {EventEmitter} = require 'events'
 
-class SyncTransform extends Stream.Transform
+class SyncTransform extends Transform
 
   constructor: (fn, options = {}) ->
     options = Object.create(options)
@@ -33,8 +34,8 @@ class Channel extends EventEmitter
       this.backoffState.on 'ready', this.onBackoffReady.bind(this)
       this.backoffState.on 'fail', this.onBackoffFail.bind(this)
 
-    this.in = new Stream.PassThrough(objectMode: true)
-    this.out = new Stream.PassThrough(objectMode: true)
+    this.in = new PassThrough(objectMode: true)
+    this.out = new PassThrough(objectMode: true)
     this.out.pause()
 
     this.start() if options.start

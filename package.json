@@ -5,7 +5,8 @@
   "main": "ws-chan.js",
   "dependencies": {
     "websocket-stream": "",
-    "backoff": ""
+    "backoff": "",
+    "readable-stream": ""
   },
   "devDependencies": {
     "semver": "",

@@ -55,7 +55,7 @@
         hello: 'world'
       });
     });
-    it('messages from sock can be read from Channel.in', function(done) {
+    it('allows messages from sock can be read from Channel.in', function(done) {
       var chan;
 
       chan = new TestChannel({
@@ -67,6 +67,21 @@
         });
         return done();
       });
+      return chan.sock.write(JSON.stringify({
+        hello: 'world'
+      }));
+    });
+    it('allows messages from sock can be read from Channel.in (delayed start)', function(done) {
+      var chan;
+
+      chan = new TestChannel();
+      chan["in"].on('data', function(message) {
+        deepEqual(message, {
+          hello: 'world'
+        });
+        return done();
+      });
+      chan.start();
       return chan.sock.write(JSON.stringify({
         hello: 'world'
       }));

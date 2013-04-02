@@ -25,7 +25,7 @@ describe 'Channel', ->
 
     chan.out.write({hello: 'world'})
 
-  it 'messages from sock can be read from Channel.in', (done) ->
+  it 'allows messages from sock can be read from Channel.in', (done) ->
 
     chan = new TestChannel(start: true)
 
@@ -35,17 +35,29 @@ describe 'Channel', ->
 
     chan.sock.write(JSON.stringify({hello: 'world'}))
 
+  it 'allows messages from sock can be read from Channel.in (delayed start)', (done) ->
+
+    chan = new TestChannel()
+
+    chan.in.on 'data', (message) ->
+      deepEqual(message, {hello: 'world'})
+      done()
+
+    chan.start()
+
+    chan.sock.write(JSON.stringify({hello: 'world'}))
+
   it 'queues outgoing messages before connect', (done) ->
     chan = new TestChannel()
 
     chan.out.write({hello: 'world'})
-
+ 
     chan.on 'open', ->
       chan.sock.on 'data', (chunk) ->
         data = JSON.parse(chunk)
         deepEqual(data, {hello: 'world'})
         done()
-
+ 
     chan.start()
 
   describe 'reconnection logic', ->
