@@ -30,15 +30,16 @@
     }
 
     SyncTransform.prototype._transform = function(chunk, encoding, cb) {
-      var e;
+      var e, transformed;
 
       try {
-        this.push(this.fn != null ? this.fn(chunk) : chunk);
-        return cb();
+        transformed = this.fn != null ? this.fn(chunk) : chunk;
       } catch (_error) {
         e = _error;
         return cb(e);
       }
+      this.push(transformed);
+      return cb();
     };
 
     return SyncTransform;
