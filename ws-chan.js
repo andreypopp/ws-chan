@@ -33,10 +33,11 @@
       var e;
 
       try {
-        return cb(null, this.fn != null ? this.fn(chunk) : chunk);
+        this.push(this.fn != null ? this.fn(chunk) : chunk);
+        return cb();
       } catch (_error) {
         e = _error;
-        return cb(e, null);
+        return cb(e);
       }
     };
 

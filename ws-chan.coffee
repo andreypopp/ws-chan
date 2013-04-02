@@ -14,9 +14,10 @@ class SyncTransform extends Transform
 
   _transform: (chunk, encoding, cb) ->
     try
-      cb(null, if this.fn? then this.fn(chunk) else chunk)
+      this.push(if this.fn? then this.fn(chunk) else chunk)
+      cb()
     catch e
-      cb(e, null)
+      cb(e)
 
 class Channel extends EventEmitter
 

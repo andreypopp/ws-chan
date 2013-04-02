@@ -51,18 +51,18 @@ describe 'Channel', ->
     chan = new TestChannel()
 
     chan.out.write({hello: 'world'})
- 
+
     chan.on 'open', ->
       chan.sock.on 'data', (chunk) ->
         data = JSON.parse(chunk)
         deepEqual(data, {hello: 'world'})
         done()
- 
+
     chan.start()
 
   describe 'reconnection logic', ->
 
-    it 're-establishes connection on end of a socket stream', (done) ->
+    it 'maintains in channel connected to current socket', (done) ->
 
       first = true
 
@@ -78,3 +78,20 @@ describe 'Channel', ->
           first = false
         else
           chan.sock.write(JSON.stringify({hello: 'world'}))
+
+    it 'maintains out channel connected to current socket', (done) ->
+
+      first = true
+
+      chan = new TestChannel(start: true)
+
+      chan.on 'open', ->
+        if first
+          chan.sock.end()
+          first = false
+        else
+          chan.sock.on 'data', (data) ->
+            message = JSON.parse(data)
+            deepEqual(message, {hello: 'world'})
+            done()
+          chan.out.write({hello: 'world'})

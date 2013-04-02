@@ -107,7 +107,7 @@
       return chan.start();
     });
     return describe('reconnection logic', function() {
-      return it('re-establishes connection on end of a socket stream', function(done) {
+      it('maintains in channel connected to current socket', function(done) {
         var chan, first;
 
         first = true;
@@ -128,6 +128,33 @@
             return chan.sock.write(JSON.stringify({
               hello: 'world'
             }));
+          }
+        });
+      });
+      return it('maintains out channel connected to current socket', function(done) {
+        var chan, first;
+
+        first = true;
+        chan = new TestChannel({
+          start: true
+        });
+        return chan.on('open', function() {
+          if (first) {
+            chan.sock.end();
+            return first = false;
+          } else {
+            chan.sock.on('data', function(data) {
+              var message;
+
+              message = JSON.parse(data);
+              deepEqual(message, {
+                hello: 'world'
+              });
+              return done();
+            });
+            return chan.out.write({
+              hello: 'world'
+            });
           }
         });
       });
