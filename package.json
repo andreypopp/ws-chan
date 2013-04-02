@@ -20,6 +20,7 @@
   "homepage": "https://github.com/andreypopp/ws-chan",
   "keywords": [
     "browser",
+    "browserify",
     "websocket",
     "stream",
     "streams",
